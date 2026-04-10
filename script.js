@@ -846,15 +846,17 @@ document.getElementById('btn-generate-audio').addEventListener('click', async ()
     try {
         const frameDelaySeconds = 1.0 / state.fps;
         const typingDuration = rawTypingFrameCount * frameDelaySeconds;
-        
+        const holdLastSeconds = state.holdLast / 1000;
+
         // 모드에 따른 총 오디오 길이 및 페이드아웃 시간 설정
         const fadeOutTime = 0.2; // 스마트 모드 페이드아웃 시간(초)
-        let totalDuration = 0;
+        let totalDuration = typingDuration + holdLastSeconds;
+
 
         if (state.audioMode === 'smart') {
-            totalDuration = typingDuration + fadeOutTime;
+            totalDuration = Math.max(totalDuration, typingDuration + fadeOutTime);
         } else {
-            totalDuration = typingDuration + uploadedAudioBuffer.duration;
+            totalDuration = Math.max(totalDuration, typingDuration + uploadedAudioBuffer.duration);
         }
 
         const offlineCtx = new OfflineAudioContext(
