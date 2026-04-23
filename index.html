@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>타자 효과 텍스트 APNG 생성기</title>
+    <title>텍스트 애니메이션 APNG 생성기</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- APNG 인코딩을 위한 라이브러리 -->
     <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
@@ -14,270 +14,419 @@
 </head>
 <body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
 
-    <header class="w-full max-w-6xl mb-6 flex justify-between items-end">
+    <header class="w-full max-w-6xl mb-4 flex justify-between items-end">
         <div>
-            <h1 class="text-3xl font-bold text-white mb-2">타자 효과 텍스트 APNG 생성기 <a href="https://x.com/bb_uu_t" target="_blank" class="text-sm text-blue-400 hover:text-blue-300">@bb_uu_t</a></h1>
-            <p class="text-sm text-gray-400">타이핑 효과 이미지 및 오디오 생성기</p>
+            <h1 class="text-3xl font-bold text-white mb-2">텍스트 애니메이션 APNG 생성기 <a href="https://x.com/bb_uu_t" target="_blank" class="text-sm text-blue-400 hover:text-blue-300">@bb_uu_t</a></h1>
+            <p class="text-sm text-gray-400">타자기 효과 및 엔딩 크레딧 이미지 생성</p>
         </div>
         <div class="flex gap-2 text-sm">
-            <button id="btn-save-local" class="btn btn-secondary">로컬 저장</button>
-            <button id="btn-load-local" class="btn btn-secondary">로컬 불러오기</button>
+            <button id="btn-save-local" class="btn btn-secondary">설정 저장</button>
+            <button id="btn-load-local" class="btn btn-secondary">설정 불러오기</button>
             <button id="btn-reset" class="btn btn-danger">초기화</button>
         </div>
     </header>
 
+    <!-- 탭 UI -->
+    <div class="w-full max-w-6xl mb-6 flex gap-2 border-b border-[#45475a] pb-0 overflow-x-auto whitespace-nowrap">
+        <button class="tab-btn active px-6 py-3 font-bold text-white border-b-2 border-[#89b4fa]" data-target="typing">타자 효과 생성기</button>
+        <button class="tab-btn px-6 py-3 font-bold text-gray-400 border-b-2 border-transparent hover:text-gray-200" data-target="glitch">글리치 효과 생성기</button>
+        <button class="tab-btn px-6 py-3 font-bold text-gray-400 border-b-2 border-transparent hover:text-gray-200" data-target="credit">엔딩 크레딧 생성기</button>
+    </div>
+
     <main class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- 설정 패널 (좌측) -->
-        <div class="lg:col-span-5 space-y-4 max-h-[80vh] overflow-y-auto pr-2 pb-4">
+        <!-- 설정 패널 영역 (좌측) -->
+        <div class="lg:col-span-5 relative">
             
-            <!-- 텍스트 입력 -->
-            <div class="panel">
-                <label class="label">텍스트 입력</label>
-                <textarea id="val-text" class="input-base h-24 resize-none" placeholder="여기에 텍스트를 입력하세요.">유이타,
-파이팅!</textarea>
-            </div>
+            <!-- [탭 1] 타자 효과 설정 패널 -->
+            <div id="panel-typing" class="space-y-4 max-h-[80vh] overflow-y-auto pr-2 pb-4">
+                <div class="panel">
+                    <label class="label">텍스트 입력</label>
+                    <textarea id="val-text" class="input-base h-24 resize-none" placeholder="여기에 텍스트를 입력하세요.">유이타,&#10;파이팅!</textarea>
+                </div>
 
-            <!-- 폰트 설정 -->
-            <div class="panel grid grid-cols-2 gap-4">
-                <div class="col-span-2 flex gap-2">
-                    <div class="flex-1">
-                        <label class="label">글꼴 선택</label>
-                        <select id="val-fontFamilySelect" class="input-base">
-                            <option value="Noto Sans KR" selected>Noto Sans KR (고딕)</option>
-                            <option value="Noto Serif KR">Noto Serif KR (명조)</option>
-                            <option value="Nanum Gothic">Nanum Gothic (나눔고딕)</option>
-                            <option value="Nanum Myeongjo">Nanum Myeongjo (나눔명조)</option>
-                            <option value="Jua">Jua (주아)</option>
-                            <option value="Do Hyeon">Do Hyeon (도현)</option>
-                            <option value="Black Han Sans">Black Han Sans (블랙한산스)</option>
-                            <option value="custom">직접 입력 (로컬 폰트명)</option>
-                        </select>
+                <div class="panel grid grid-cols-2 gap-4">
+                    <div class="col-span-2 flex gap-2">
+                        <div class="flex-1">
+                            <label class="label">글꼴 선택</label>
+                            <select id="val-fontFamilySelect" class="input-base">
+                                <option value="Noto Sans KR" selected>Noto Sans KR (고딕)</option>
+                                <option value="Noto Serif KR">Noto Serif KR (명조)</option>
+                                <option value="Nanum Gothic">Nanum Gothic (나눔고딕)</option>
+                                <option value="Nanum Myeongjo">Nanum Myeongjo (나눔명조)</option>
+                                <option value="Jua">Jua (주아)</option>
+                                <option value="Do Hyeon">Do Hyeon (도현)</option>
+                                <option value="Black Han Sans">Black Han Sans (블랙한산스)</option>
+                                <option value="custom">직접 입력 (로컬 폰트명)</option>
+                            </select>
+                        </div>
+                        <div class="flex-1" id="custom-font-container" style="display: none;">
+                            <label class="label">직접 입력</label>
+                            <input type="text" id="val-fontFamilyCustom" class="input-base" placeholder="폰트 이름 입력" value="">
+                        </div>
                     </div>
-                    <div class="flex-1" id="custom-font-container" style="display: none;">
-                        <label class="label">직접 입력</label>
-                        <input type="text" id="val-fontFamilyCustom" class="input-base" placeholder="폰트 이름 입력" value="">
-                    </div>
-                </div>
-                <div>
-                    <label class="label">글꼴 크기 (px)</label>
-                    <input type="number" id="val-fontSize" class="input-base" value="48">
-                </div>
-                <div>
-                    <label class="label">장평 (%)</label>
-                    <input type="number" id="val-scaleX" class="input-base" value="100">
-                </div>
-                <div>
-                    <label class="label">자간 (px)</label>
-                    <input type="number" id="val-letterSpacing" class="input-base" value="0">
-                </div>
-                <div>
-                    <label class="label">줄간격 배수</label>
-                    <input type="number" step="0.1" id="val-lineHeight" class="input-base" value="1.2">
-                </div>
-                <div class="col-span-2 grid grid-cols-4 gap-2 bg-[#181825] p-3 rounded-lg border border-[#45475a] mt-2">
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" id="val-isBold" class="w-4 h-4 accent-[#89b4fa] cursor-pointer rounded border-[#45475a] bg-[#1e1e2e]">
-                        <label for="val-isBold" class="label mb-0 cursor-pointer">굵게</label>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" id="val-isItalic" class="w-4 h-4 accent-[#89b4fa] cursor-pointer rounded border-[#45475a] bg-[#1e1e2e]">
-                        <label for="val-isItalic" class="label mb-0 cursor-pointer">기울임</label>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" id="val-isUnderline" class="w-4 h-4 accent-[#89b4fa] cursor-pointer rounded border-[#45475a] bg-[#1e1e2e]">
-                        <label for="val-isUnderline" class="label mb-0 cursor-pointer">밑줄</label>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" id="val-isStrikethrough" class="w-4 h-4 accent-[#89b4fa] cursor-pointer rounded border-[#45475a] bg-[#1e1e2e]">
-                        <label for="val-isStrikethrough" class="label mb-0 cursor-pointer">취소선</label>
+                    <div><label class="label">글꼴 크기 (px)</label><input type="number" id="val-fontSize" class="input-base" value="48"></div>
+                    <div><label class="label">장평 (%)</label><input type="number" id="val-scaleX" class="input-base" value="100"></div>
+                    <div><label class="label">자간 (px)</label><input type="number" id="val-letterSpacing" class="input-base" value="0"></div>
+                    <div><label class="label">줄간격 배수</label><input type="number" step="0.1" id="val-lineHeight" class="input-base" value="1.2"></div>
+                    <div class="col-span-2 grid grid-cols-4 gap-2 bg-[#181825] p-3 rounded-lg border border-[#45475a] mt-2">
+                        <div class="flex items-center gap-2"><input type="checkbox" id="val-isBold" class="w-4 h-4 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]"><label for="val-isBold" class="label mb-0 cursor-pointer">굵게</label></div>
+                        <div class="flex items-center gap-2"><input type="checkbox" id="val-isItalic" class="w-4 h-4 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]"><label for="val-isItalic" class="label mb-0 cursor-pointer">기울임</label></div>
+                        <div class="flex items-center gap-2"><input type="checkbox" id="val-isUnderline" class="w-4 h-4 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]"><label for="val-isUnderline" class="label mb-0 cursor-pointer">밑줄</label></div>
+                        <div class="flex items-center gap-2"><input type="checkbox" id="val-isStrikethrough" class="w-4 h-4 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]"><label for="val-isStrikethrough" class="label mb-0 cursor-pointer">취소선</label></div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 레이아웃 설정 -->
-            <div class="panel grid grid-cols-2 gap-4">
-                <div>
-                    <label class="label">쓰기 방향</label>
-                    <select id="val-writingMode" class="input-base">
-                        <option value="horizontal">가로 쓰기</option>
-                        <option value="vertical">세로 쓰기</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="label">가로 정렬</label>
-                    <select id="val-textAlign" class="input-base">
-                        <option value="left">왼쪽 정렬</option>
-                        <option value="center" selected>가운데 정렬</option>
-                        <option value="right">오른쪽 정렬</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="label">세로 정렬</label>
-                    <select id="val-verticalAlign" class="input-base">
-                        <option value="top">위 정렬</option>
-                        <option value="center" selected>가운데 정렬</option>
-                        <option value="bottom">아래 정렬</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="label">등장 방향</label>
-                    <select id="val-direction" class="input-base">
-                        <option value="forward" selected>정방향 (앞에서부터)</option>
-                        <option value="backward">역방향 (뒤에서부터)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- 도형 쓰기 설정 -->
-            <div class="panel grid grid-cols-2 gap-4">
-                <div>
-                    <label class="label">도형 모드</label>
-                    <select id="val-shapeMode" class="input-base">
-                        <option value="none" selected>사용 안 함 (기본)</option>
-                        <option value="circle">원</option>
-                        <option value="square">사각형</option>
-                        <option value="triangle">삼각형</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="label">도형 크기 (반지름/기준 크기 px)</label>
-                    <input type="number" id="val-shapeSize" class="input-base" value="100">
-                </div>
-                <div class="col-span-2">
-                    <label class="label">프레임당 회전 속도 (도/프레임)</label>
-                    <input type="number" step="0.5" id="val-shapeRotateSpeed" class="input-base" value="0">
-                    <p class="text-xs text-gray-400 mt-1">양수는 시계방향, 음수는 반시계방향으로 전체 도형이 회전합니다. (도형 모드 시에만 적용)</p>
-                </div>
-            </div>
-
-            <!-- 스타일 설정 -->
-            <div class="panel grid grid-cols-2 gap-4">
-                <div class="col-span-2 flex flex-col gap-2 bg-[#181825] p-3 rounded-lg border border-[#45475a]">
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" id="val-useBackgroundColor" class="w-5 h-5 accent-[#89b4fa] cursor-pointer rounded border-[#45475a] bg-[#1e1e2e]">
-                        <label for="val-useBackgroundColor" class="label mb-0 cursor-pointer">배경색 사용 (GIF 내보내기 최적화 등)</label>
-                    </div>
-                    <div class="flex items-center gap-2 w-full">
-                        <label class="label w-24 mb-0">배경 색상</label>
-                        <input type="color" id="val-backgroundColor" class="input-base h-10 p-1 flex-1" value="#000000">
-                    </div>
-                </div>
-                <div>
-                    <label class="label">채우기 색상</label>
-                    <input type="color" id="val-fillColor" class="input-base h-10 p-1" value="#ffffff">
-                </div>
-                <div>
-                    <label class="label">테두리 색상</label>
-                    <input type="color" id="val-strokeColor" class="input-base h-10 p-1" value="#000000">
-                </div>
-                <div class="col-span-2">
-                    <label class="label">테두리 두께 (px)</label>
-                    <input type="number" id="val-strokeWidth" class="input-base" value="4">
-                </div>
-                <div>
-                    <label class="label">그림자 색상</label>
-                    <input type="color" id="val-shadowColor" class="input-base h-10 p-1" value="#000000">
-                </div>
-                <div>
-                    <label class="label">그림자 퍼짐 (px)</label>
-                    <input type="number" id="val-shadowBlur" class="input-base" value="4">
-                </div>
-                <div>
-                    <label class="label">그림자 X 오프셋</label>
-                    <input type="number" id="val-shadowOffsetX" class="input-base" value="2">
-                </div>
-                <div>
-                    <label class="label">그림자 Y 오프셋</label>
-                    <input type="number" id="val-shadowOffsetY" class="input-base" value="2">
-                </div>
-            </div>
-
-            <!-- 애니메이션 및 내보내기 설정 -->
-            <div class="panel grid grid-cols-2 gap-4">
-                <div>
-                    <label class="label">초당 프레임 수 (FPS)</label>
-                    <input type="number" id="val-fps" class="input-base" value="12">
-                    <p class="text-xs text-gray-400 mt-1">타이핑 속도를 결정합니다.</p>
-                </div>
-                <div>
-                    <label class="label">완성 후 대기 (ms)</label>
-                    <input type="number" id="val-holdLast" class="input-base" value="2000">
-                    <p class="text-xs text-gray-400 mt-1">텍스트 연출 완료 후 머무르는 시간입니다.</p>
-                </div>
-                <div class="col-span-2 grid grid-cols-2 gap-4 bg-[#181825] p-3 rounded-lg border border-[#45475a]">
+                <div class="panel grid grid-cols-2 gap-4">
                     <div>
-                        <label class="label">페이드아웃 모드</label>
-                        <select id="val-fadeMode" class="input-base">
-                            <option value="none" selected>사용 안 함</option>
-                            <option value="global">전체 동시 페이드아웃</option>
-                            <option value="individual">개별 글자 순차 페이드아웃</option>
-                        </select>
+                        <label class="label">쓰기 방향</label>
+                        <select id="val-writingMode" class="input-base"><option value="horizontal">가로 쓰기</option><option value="vertical">세로 쓰기</option></select>
                     </div>
                     <div>
-                        <label class="label">페이드아웃 시간 (ms)</label>
-                        <input type="number" id="val-fadeOutDuration" class="input-base" value="1000">
+                        <label class="label">가로 정렬</label>
+                        <select id="val-textAlign" class="input-base"><option value="left">왼쪽 정렬</option><option value="center" selected>가운데 정렬</option><option value="right">오른쪽 정렬</option></select>
+                    </div>
+                    <div>
+                        <label class="label">세로 정렬</label>
+                        <select id="val-verticalAlign" class="input-base"><option value="top">위 정렬</option><option value="center" selected>가운데 정렬</option><option value="bottom">아래 정렬</option></select>
+                    </div>
+                    <div>
+                        <label class="label">등장 방향</label>
+                        <select id="val-direction" class="input-base"><option value="forward" selected>정방향 (앞에서부터)</option><option value="backward">역방향 (뒤에서부터)</option></select>
                     </div>
                 </div>
-                <div>
-                    <label class="label">캔버스 너비 (px)</label>
-                    <input type="number" id="val-canvasWidth" class="input-base" value="600">
+
+                <div class="panel grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label">도형 모드</label>
+                        <select id="val-shapeMode" class="input-base">
+                            <option value="none" selected>사용 안 함 (기본)</option>
+                            <option value="circle">원</option>
+                            <option value="square">사각형</option>
+                            <option value="triangle">삼각형</option>
+                        </select>
+                    </div>
+                    <div><label class="label">도형 크기</label><input type="number" id="val-shapeSize" class="input-base" value="100"></div>
+                    <div class="col-span-2">
+                        <label class="label">프레임당 회전 속도 (도/프레임)</label>
+                        <input type="number" step="0.5" id="val-shapeRotateSpeed" class="input-base" value="0">
+                    </div>
                 </div>
-                <div>
-                    <label class="label">캔버스 높이 (px)</label>
-                    <input type="number" id="val-canvasHeight" class="input-base" value="300">
+
+                <div class="panel grid grid-cols-2 gap-4">
+                    <div class="col-span-2 flex flex-col gap-2 bg-[#181825] p-3 rounded-lg border border-[#45475a]">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="val-useBackgroundColor" class="w-5 h-5 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]">
+                            <label for="val-useBackgroundColor" class="label mb-0 cursor-pointer">배경색 사용 (GIF 내보내기 최적화 등)</label>
+                        </div>
+                        <div class="flex items-center gap-2 w-full">
+                            <label class="label w-24 mb-0">배경 색상</label>
+                            <input type="color" id="val-backgroundColor" class="input-base h-10 p-1 flex-1" value="#000000">
+                        </div>
+                    </div>
+                    <div><label class="label">채우기 색상</label><input type="color" id="val-fillColor" class="input-base h-10 p-1" value="#ffffff"></div>
+                    <div><label class="label">테두리 색상</label><input type="color" id="val-strokeColor" class="input-base h-10 p-1" value="#000000"></div>
+                    <div class="col-span-2"><label class="label">테두리 두께 (px)</label><input type="number" id="val-strokeWidth" class="input-base" value="4"></div>
+                    <div><label class="label">그림자 색상</label><input type="color" id="val-shadowColor" class="input-base h-10 p-1" value="#000000"></div>
+                    <div><label class="label">그림자 퍼짐</label><input type="number" id="val-shadowBlur" class="input-base" value="4"></div>
+                    <div><label class="label">그림자 X 오프셋</label><input type="number" id="val-shadowOffsetX" class="input-base" value="2"></div>
+                    <div><label class="label">그림자 Y 오프셋</label><input type="number" id="val-shadowOffsetY" class="input-base" value="2"></div>
                 </div>
-                <div class="col-span-2">
-                    <button id="btn-auto-size" class="btn btn-secondary w-full text-sm">텍스트 여백 자르기</button>
+
+                <div class="panel grid grid-cols-2 gap-4">
+                    <div><label class="label">초당 프레임 수 (FPS)</label><input type="number" id="val-fps" class="input-base" value="12"></div>
+                    <div><label class="label">완성 후 대기 (ms)</label><input type="number" id="val-holdLast" class="input-base" value="2000"></div>
+                    <div class="col-span-2 grid grid-cols-2 gap-4 bg-[#181825] p-3 rounded-lg border border-[#45475a]">
+                        <div>
+                            <label class="label">페이드아웃 모드</label>
+                            <select id="val-fadeMode" class="input-base">
+                                <option value="none" selected>사용 안 함</option>
+                                <option value="global">전체 동시 페이드아웃</option>
+                                <option value="individual">개별 글자 순차 페이드아웃</option>
+                            </select>
+                        </div>
+                        <div><label class="label">페이드아웃 시간 (ms)</label><input type="number" id="val-fadeOutDuration" class="input-base" value="1000"></div>
+                    </div>
+                    <div><label class="label">캔버스 너비 (px)</label><input type="number" id="val-canvasWidth" class="input-base" value="600"></div>
+                    <div><label class="label">캔버스 높이 (px)</label><input type="number" id="val-canvasHeight" class="input-base" value="300"></div>
+                    <div class="col-span-2 flex items-center gap-2 bg-[#181825] p-3 rounded-lg border border-[#45475a]">
+                        <input type="checkbox" id="val-apngCompress" class="w-5 h-5 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]" checked>
+                        <label for="val-apngCompress" class="label mb-0 cursor-pointer">APNG 압축 (파일 용량 대폭 감소, 256색 제한)</label>
+                    </div>
+                    <div class="col-span-2">
+                        <button id="btn-auto-size" class="btn btn-secondary w-full text-sm">텍스트 여백 자르기</button>
+                    </div>
+                </div>
+
+                <div class="panel space-y-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">오디오 효과음 생성 (옵션)</h3>
+                        <p class="text-xs text-gray-400 mt-1 mb-3">타이핑에 맞춰 재생될 효과음 파일(mp3, wav 등)을 업로드하세요.</p>
+                        <input type="file" id="input-audio" accept="audio/*" class="input-base mb-3">
+                        <label class="label">효과음 재생 방식</label>
+                        <select id="val-audioMode" class="input-base">
+                            <option value="overlap" selected>프레임 재생 (겹침 허용)</option>
+                            <option value="smart">맞춤형 (겹침 방지 및 종료 시 페이드아웃)</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="btn-generate-audio" class="btn btn-secondary flex-1" disabled>효과음 생성 및 미리듣기</button>
+                        <button id="btn-download-audio" class="btn btn-primary flex-1 hidden">WAV 다운로드</button>
+                    </div>
+                    <audio id="audio-preview" controls class="w-full mt-2 hidden" style="border-radius: 8px;"></audio>
                 </div>
             </div>
 
-            <!-- 오디오 (효과음) 설정 패널 -->
-            <div class="panel space-y-4">
-                <div>
-                    <h3 class="text-lg font-bold text-white">오디오 효과음 생성 (옵션)</h3>
-                    <p class="text-xs text-gray-400 mt-1 mb-3">타이핑에 맞춰 재생될 효과음 파일(mp3, wav 등)을 업로드하세요.</p>
-                    <input type="file" id="input-audio" accept="audio/*" class="input-base mb-3">
-                    
-                    <label class="label">효과음 재생 방식</label>
-                    <select id="val-audioMode" class="input-base">
-                        <option value="overlap" selected>프레임 재생 (겹침 허용)</option>
-                        <option value="smart">맞춤형 (겹침 방지 및 종료 시 페이드아웃)</option>
-                    </select>
-                </div>
-                
-                <div class="flex gap-2">
-                    <button id="btn-generate-audio" class="btn btn-secondary flex-1" disabled>효과음 생성 및 미리듣기</button>
-                    <button id="btn-download-audio" class="btn btn-primary flex-1 hidden">WAV 다운로드</button>
+            <!-- [탭 2] 글리치 효과 설정 패널 -->
+            <div id="panel-glitch" class="space-y-4 max-h-[80vh] overflow-y-auto pr-2 pb-4 hidden">
+                <div class="panel">
+                    <label class="label">텍스트 입력</label>
+                    <textarea id="val-glitch-text" class="input-base h-24 resize-none" placeholder="여기에 텍스트를 입력하세요.">SYSTEM ERROR&#10;오류가 발생했습니다.</textarea>
                 </div>
 
-                <audio id="audio-preview" controls class="w-full mt-2 hidden" style="border-radius: 8px;"></audio>
+                <div class="panel grid grid-cols-2 gap-4">
+                    <div class="col-span-2 flex gap-2">
+                        <div class="flex-1">
+                            <label class="label">글꼴 선택</label>
+                            <select id="val-glitch-fontFamilySelect" class="input-base">
+                                <option value="Noto Sans KR" selected>Noto Sans KR (고딕)</option>
+                                <option value="Noto Serif KR">Noto Serif KR (명조)</option>
+                                <option value="Nanum Gothic">Nanum Gothic (나눔고딕)</option>
+                                <option value="Nanum Myeongjo">Nanum Myeongjo (나눔명조)</option>
+                                <option value="Jua">Jua (주아)</option>
+                                <option value="Do Hyeon">Do Hyeon (도현)</option>
+                                <option value="Black Han Sans">Black Han Sans (블랙한산스)</option>
+                                <option value="custom">직접 입력 (로컬 폰트명)</option>
+                            </select>
+                        </div>
+                        <div class="flex-1" id="custom-glitch-font-container" style="display: none;">
+                            <label class="label">직접 입력</label>
+                            <input type="text" id="val-glitch-fontFamilyCustom" class="input-base" placeholder="폰트 이름 입력" value="">
+                        </div>
+                    </div>
+                    <div><label class="label">글꼴 크기 (px)</label><input type="number" id="val-glitch-fontSize" class="input-base" value="48"></div>
+                    <div><label class="label">장평 (%)</label><input type="number" id="val-glitch-scaleX" class="input-base" value="100"></div>
+                    <div><label class="label">자간 (px)</label><input type="number" id="val-glitch-letterSpacing" class="input-base" value="0"></div>
+                    <div><label class="label">줄간격 배수</label><input type="number" step="0.1" id="val-glitch-lineHeight" class="input-base" value="1.2"></div>
+                    <div class="col-span-2 grid grid-cols-4 gap-2 bg-[#181825] p-3 rounded-lg border border-[#45475a] mt-2">
+                        <div class="flex items-center gap-2"><input type="checkbox" id="val-glitch-isBold" class="w-4 h-4 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]"><label for="val-glitch-isBold" class="label mb-0 cursor-pointer">굵게</label></div>
+                        <div class="flex items-center gap-2"><input type="checkbox" id="val-glitch-isItalic" class="w-4 h-4 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]"><label for="val-glitch-isItalic" class="label mb-0 cursor-pointer">기울임</label></div>
+                        <div class="flex items-center gap-2"><input type="checkbox" id="val-glitch-isUnderline" class="w-4 h-4 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]"><label for="val-glitch-isUnderline" class="label mb-0 cursor-pointer">밑줄</label></div>
+                        <div class="flex items-center gap-2"><input type="checkbox" id="val-glitch-isStrikethrough" class="w-4 h-4 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]"><label for="val-glitch-isStrikethrough" class="label mb-0 cursor-pointer">취소선</label></div>
+                    </div>
+                </div>
+
+                <div class="panel grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label">쓰기 방향</label>
+                        <select id="val-glitch-writingMode" class="input-base"><option value="horizontal">가로 쓰기</option><option value="vertical">세로 쓰기</option></select>
+                    </div>
+                    <div>
+                        <label class="label">가로 정렬</label>
+                        <select id="val-glitch-textAlign" class="input-base"><option value="left">왼쪽 정렬</option><option value="center" selected>가운데 정렬</option><option value="right">오른쪽 정렬</option></select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="label">세로 정렬</label>
+                        <select id="val-glitch-verticalAlign" class="input-base"><option value="top">위 정렬</option><option value="center" selected>가운데 정렬</option><option value="bottom">아래 정렬</option></select>
+                    </div>
+                </div>
+
+                <div class="panel grid grid-cols-2 gap-4">
+                    <div class="col-span-2 flex flex-col gap-2 bg-[#181825] p-3 rounded-lg border border-[#45475a]">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="val-glitch-useBackgroundColor" class="w-5 h-5 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]">
+                            <label for="val-glitch-useBackgroundColor" class="label mb-0 cursor-pointer">배경색 사용</label>
+                        </div>
+                        <div class="flex items-center gap-2 w-full">
+                            <label class="label w-24 mb-0">배경 색상</label>
+                            <input type="color" id="val-glitch-backgroundColor" class="input-base h-10 p-1 flex-1" value="#000000">
+                        </div>
+                    </div>
+                    <div><label class="label">채우기 색상</label><input type="color" id="val-glitch-fillColor" class="input-base h-10 p-1" value="#ff0033"></div>
+                    <div><label class="label">테두리 색상</label><input type="color" id="val-glitch-strokeColor" class="input-base h-10 p-1" value="#000000"></div>
+                    <div class="col-span-2"><label class="label">테두리 두께 (px)</label><input type="number" id="val-glitch-strokeWidth" class="input-base" value="2"></div>
+                    <div><label class="label">그림자 색상</label><input type="color" id="val-glitch-shadowColor" class="input-base h-10 p-1" value="#ff0033"></div>
+                    <div><label class="label">그림자 퍼짐</label><input type="number" id="val-glitch-shadowBlur" class="input-base" value="8"></div>
+                    <div><label class="label">그림자 X 오프셋</label><input type="number" id="val-glitch-shadowOffsetX" class="input-base" value="0"></div>
+                    <div><label class="label">그림자 Y 오프셋</label><input type="number" id="val-glitch-shadowOffsetY" class="input-base" value="0"></div>
+                </div>
+
+                <div class="panel grid grid-cols-2 gap-4">
+                    <div class="col-span-2 bg-[#181825] p-3 rounded-lg border border-[#f38ba8]">
+                        <label class="label text-[#f38ba8] mb-2">글리치 문자 종류</label>
+                        <div class="flex flex-wrap gap-4 mb-3">
+                            <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                                <input type="checkbox" id="val-glitch-glitchRangeLatin" class="w-4 h-4 accent-[#f38ba8]"> 라틴/특수기호
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                                <input type="checkbox" id="val-glitch-glitchRangeKana" class="w-4 h-4 accent-[#f38ba8]"> 가나 (일본어)
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                                <input type="checkbox" id="val-glitch-glitchRangeHangul" class="w-4 h-4 accent-[#f38ba8]"> 한글
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                                <input type="checkbox" id="val-glitch-glitchRangeSymbols" class="w-4 h-4 accent-[#f38ba8]"> 도형/기호
+                            </label>
+                        </div>
+                        
+                        <div class="border-t border-[#45475a] my-3 pt-3">
+                            <label class="flex items-center gap-2 cursor-pointer text-sm text-[#f38ba8] font-bold mb-1">
+                                <input type="checkbox" id="val-glitch-simultaneousMode" class="w-5 h-5 accent-[#f38ba8] rounded bg-[#1e1e2e]">
+                                전체 글리치 동시 표시 후 순차 복구
+                            </label>
+                            <p class="text-xs text-gray-400">체크 시, 텍스트 전체 길이에 맞게 한 번에 글리치가 출력된 후 한 글자씩 차례대로 원래 글자로 해독됩니다.</p>
+                        </div>
+
+                        <label class="label text-[#f38ba8] mt-4">글리치 강도 (각 글자당 랜덤 문자 프레임 수)</label>
+                        <input type="number" id="val-glitch-glitchCount" class="input-base border-[#f38ba8]" value="3">
+                        <p class="text-xs text-gray-400 mt-1">글자가 원래 모습으로 복구되기 전에 무작위 문자가 스쳐지나가는 프레임 수입니다.</p>
+                    </div>
+                    <div><label class="label">초당 프레임 수 (FPS)</label><input type="number" id="val-glitch-fps" class="input-base" value="15"></div>
+                    <div><label class="label">완성 후 대기 (ms)</label><input type="number" id="val-glitch-holdLast" class="input-base" value="2000"></div>
+                    <div><label class="label">캔버스 너비 (px)</label><input type="number" id="val-glitch-canvasWidth" class="input-base" value="600"></div>
+                    <div><label class="label">캔버스 높이 (px)</label><input type="number" id="val-glitch-canvasHeight" class="input-base" value="300"></div>
+                    <div class="col-span-2 flex items-center gap-2 bg-[#181825] p-3 rounded-lg border border-[#45475a]">
+                        <input type="checkbox" id="val-glitch-apngCompress" class="w-5 h-5 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]" checked>
+                        <label for="val-glitch-apngCompress" class="label mb-0 cursor-pointer">APNG 압축 (파일 용량 대폭 감소, 256색 제한)</label>
+                    </div>
+                    <div class="col-span-2">
+                        <button id="btn-glitch-auto-size" class="btn btn-secondary w-full text-sm">텍스트 여백 자르기</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- JSON 데이터 설정 -->
-            <div class="panel flex gap-2">
-                <button id="btn-export-json" class="btn btn-secondary flex-1">JSON 내보내기</button>
+            <!-- [탭 3] 엔딩 크레딧 설정 패널 -->
+            <div id="panel-credit" class="space-y-4 max-h-[80vh] overflow-y-auto pr-2 pb-4 hidden">
+                <div class="panel">
+                    <label class="label">가사 및 크레딧 텍스트 입력</label>
+                    <textarea id="val-credit-text" class="input-base h-40 resize-none" placeholder="빈 줄을 추가하여 문단을 나눌 수 있습니다.">
+빈 줄을 기준으로 나눌 수 있어요
+
+순번_가사_생성시간 형태로
+저장할 수 있답니다.</textarea>
+                    <p class="text-xs text-gray-400 mt-2">두 번의 줄바꿈(빈 줄)을 사용하여 문단을 구분할 수 있습니다.</p>
+                </div>
+
+                <div class="panel grid grid-cols-2 gap-4">
+                    <div class="col-span-2 flex gap-2">
+                        <div class="flex-1">
+                            <label class="label">글꼴 선택</label>
+                            <select id="val-credit-fontFamilySelect" class="input-base">
+                                <option value="Noto Sans KR" selected>Noto Sans KR (고딕)</option>
+                                <option value="Noto Serif KR">Noto Serif KR (명조)</option>
+                                <option value="Nanum Gothic">Nanum Gothic (나눔고딕)</option>
+                                <option value="Nanum Myeongjo">Nanum Myeongjo (나눔명조)</option>
+                                <option value="Jua">Jua (주아)</option>
+                                <option value="Do Hyeon">Do Hyeon (도현)</option>
+                                <option value="Black Han Sans">Black Han Sans (블랙한산스)</option>
+                                <option value="custom">직접 입력 (로컬 폰트명)</option>
+                            </select>
+                        </div>
+                        <div class="flex-1" id="custom-credit-font-container" style="display: none;">
+                            <label class="label">직접 입력</label>
+                            <input type="text" id="val-credit-fontFamilyCustom" class="input-base" placeholder="폰트 이름 입력" value="">
+                        </div>
+                    </div>
+                    <div><label class="label">글꼴 크기 (px)</label><input type="number" id="val-credit-fontSize" class="input-base" value="32"></div>
+                    <div><label class="label">줄간격 배수</label><input type="number" step="0.1" id="val-credit-lineHeight" class="input-base" value="1.5"></div>
+                    <div>
+                        <label class="label">가로 정렬</label>
+                        <select id="val-credit-textAlign" class="input-base">
+                            <option value="left">왼쪽 정렬</option>
+                            <option value="center" selected>가운데 정렬</option>
+                            <option value="right">오른쪽 정렬</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center mt-6">
+                        <input type="checkbox" id="val-credit-isBold" class="w-5 h-5 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]">
+                        <label for="val-credit-isBold" class="label mb-0 ml-2 cursor-pointer">굵은 글씨</label>
+                    </div>
+                </div>
+
+                <div class="panel grid grid-cols-2 gap-4">
+                    <div class="col-span-2 flex flex-col gap-2 bg-[#181825] p-3 rounded-lg border border-[#45475a]">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="val-credit-useBackgroundColor" class="w-5 h-5 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]">
+                            <label for="val-credit-useBackgroundColor" class="label mb-0 cursor-pointer">배경색 사용 (GIF 최적화용)</label>
+                        </div>
+                        <div class="flex items-center gap-2 w-full">
+                            <label class="label w-24 mb-0">배경 색상</label>
+                            <input type="color" id="val-credit-backgroundColor" class="input-base h-10 p-1 flex-1" value="#000000">
+                        </div>
+                    </div>
+                    <div><label class="label">글자 색상</label><input type="color" id="val-credit-fillColor" class="input-base h-10 p-1" value="#ffffff"></div>
+                    <div><label class="label">테두리 색상</label><input type="color" id="val-credit-strokeColor" class="input-base h-10 p-1" value="#000000"></div>
+                    <div class="col-span-2"><label class="label">테두리 두께 (px)</label><input type="number" id="val-credit-strokeWidth" class="input-base" value="2"></div>
+                    <div><label class="label">그림자 색상</label><input type="color" id="val-credit-shadowColor" class="input-base h-10 p-1" value="#000000"></div>
+                    <div><label class="label">그림자 퍼짐</label><input type="number" id="val-credit-shadowBlur" class="input-base" value="4"></div>
+                    <div><label class="label">그림자 X 오프셋</label><input type="number" id="val-credit-shadowOffsetX" class="input-base" value="2"></div>
+                    <div><label class="label">그림자 Y 오프셋</label><input type="number" id="val-credit-shadowOffsetY" class="input-base" value="2"></div>
+                </div>
+
+                <div class="panel grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label">총 재생 시간 (초)</label>
+                        <input type="number" id="val-credit-totalDuration" class="input-base" value="20">
+                    </div>
+                    <div>
+                        <label class="label">초당 프레임 수 (FPS)</label>
+                        <input type="number" id="val-credit-fps" class="input-base" value="12">
+                    </div>
+                    <div class="col-span-2 bg-[#181825] p-3 rounded-lg border border-[#45475a]">
+                        <label class="label mb-2">이미지 내보내기 및 분할 방식</label>
+                        <div class="flex flex-col gap-3">
+                            <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                                <input type="radio" name="val-credit-splitMode" value="false" checked class="w-4 h-4 accent-[#89b4fa]"> 하나의 통 이미지 (전체 텍스트)
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                                <input type="radio" name="val-credit-splitMode" value="true" class="w-4 h-4 accent-[#89b4fa]"> 빈 줄 기준 문단별 다중 이미지 분할
+                            </label>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">분할 모드 선택 시, 전체 시간을 문단별 글자 수에 비례하여 자동 배분한 뒤 여러 장의 이미지로 연속 저장됩니다.</p>
+                    </div>
+                    <div><label class="label">캔버스 너비 (px)</label><input type="number" id="val-credit-canvasWidth" class="input-base" value="600"></div>
+                    <div><label class="label">캔버스 높이 (px)</label><input type="number" id="val-credit-canvasHeight" class="input-base" value="800"></div>
+                    <div class="col-span-2 flex items-center gap-2 bg-[#181825] p-3 rounded-lg border border-[#45475a]">
+                        <input type="checkbox" id="val-credit-apngCompress" class="w-5 h-5 accent-[#89b4fa] cursor-pointer rounded bg-[#1e1e2e]" checked>
+                        <label for="val-credit-apngCompress" class="label mb-0 cursor-pointer">APNG 압축 (파일 용량 대폭 감소, 256색 제한)</label>
+                    </div>
+                </div>
+
+                <div class="panel space-y-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">무음 오디오 생성</h3>
+                        <p class="text-xs text-gray-400 mt-1 mb-3">이미지 길이에 맞는 무음 오디오를 생성합니다.</p>
+                        <label class="label">추가 연장 시간 (초)</label>
+                        <input type="number" id="val-credit-silentAudioExtension" class="input-base mb-3" value="0" step="0.1">
+                    </div>
+                    <button id="btn-generate-silent-audio" class="btn btn-secondary w-full">문단별 무음 오디오 다운로드</button>
+                </div>
+            </div>
+
+            <!-- 공통 JSON 설정 -->
+            <div class="panel flex gap-2 mt-4">
+                <button id="btn-export-json" class="btn btn-secondary flex-1">설정 내보내기</button>
                 <label for="input-import-json" class="btn btn-secondary flex-1 m-0 text-center cursor-pointer">
-                    JSON 불러오기
+                    설정 불러오기
                     <input type="file" id="input-import-json" accept=".json" class="hidden">
                 </label>
             </div>
 
         </div>
 
-        <!-- 프리뷰 및 결과 패널 (우측) -->
+        <!-- 미리보기 및 결과 패널 (우측) -->
         <div class="lg:col-span-7 flex flex-col space-y-4">
             <div class="panel flex-1 flex flex-col">
                 <h2 class="text-xl font-bold mb-4 flex justify-between items-center">
                     <span>미리보기</span>
-                    <span id="preview-status" class="text-sm font-normal text-gray-400">프레임: 0 / 0</span>
+                    <span id="preview-status" class="text-sm font-normal text-gray-400">프레임: 0 / 0 (예상: ~0.00MB)</span>
                 </h2>
                 
-                <div class="flex-1 flex items-center justify-center bg-[#181825] rounded-lg overflow-hidden border border-[#45475a] p-4">
+                <div class="flex-1 flex items-center justify-center bg-[#181825] rounded-lg overflow-hidden border border-[#45475a] p-4 min-h-[400px]">
                     <canvas id="preview-canvas" class="max-w-full max-h-full object-contain" width="600" height="300"></canvas>
                 </div>
 
-                <div class="mt-4 flex justify-end gap-2">
+                <div class="mt-4 flex justify-end gap-2 flex-wrap">
                     <button id="btn-pause-preview" class="btn btn-secondary">일시정지</button>
                     <button id="btn-resume-preview" class="btn btn-secondary">재생</button>
                     <button id="btn-play-preview" class="btn btn-secondary">다시 재생</button>
